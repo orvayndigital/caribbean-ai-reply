@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function Home() {
+  const [conversation, setConversation] = useState([]);
   const [message, setMessage] = useState("");
-  const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [hours, setHours] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [saved, setSaved] = useState(false);
+  const chatEndRef = useRef(null);
 
   useEffect(() => {
     const savedBusinessName = localStorage.getItem("businessName");
@@ -29,255 +30,217 @@ export default function Home() {
     return () => clearTimeout(timer);
   }, [businessName, hours, businessType]);
 
-  async function generateReply() {
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [conversation]);
+
+  async function sendMessage() {
+    if (!message.trim()) return;
+
+    const userMessage = { role: "user", content: message };
+    const newConversation = [...conversation, userMessage];
+    setConversation(newConversation);
+    setMessage("");
     setLoading(true);
-    setResult("");
 
     try {
       const res = await fetch("/api/reply", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    message,
-    businessName,
-    hours,
-    businessType,
-  }),
-});
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message,
+          businessName,
+          hours,
+          businessType,
+          history: conversation,
+        }),
+      });
 
       const data = await res.json();
-      setResult(data.reply || "No reply generated.");
+      const assistantMessage = { role: "assistant", content: data.reply };
+      setConversation([...newConversation, assistantMessage]);
     } catch (error) {
-      setResult("Something went wrong. Please try again.");
+      setConversation([...newConversation, { role: "assistant", content: "Something went wrong. Please try again." }]);
     }
 
     setLoading(false);
   }
 
-  async function copyReply() {
-    await navigator.clipboard.writeText(result);
-    alert("Reply copied");
+  function clearChat() {
+    setConversation([]);
+  }
+
+  async function copyLastReply() {
+    const lastAssistant = conversation.filter(m => m.role === "assistant").pop();
+    if (lastAssistant) {
+      await navigator.clipboard.writeText(lastAssistant.content);
+      alert("Last reply copied");
+    }
   }
 
   return (
-    <main style={{ padding: "40px", maxWidth: "700px", margin: "auto" }}>
+    <main style={{ padding: "20px", maxWidth: "700px", margin: "auto", height: "100vh", display: "flex", flexDirection: "column" }}>
       <h1 style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "10px" }}>
         Caribbean WhatsApp Reply AI
       </h1>
 
       <p style={{ marginBottom: "20px" }}>
-        Paste a customer message and get a fast WhatsApp-style reply.
+        Chat with the AI assistant for your business.
       </p>
 
-      <div style={{ marginBottom: "20px" }}>
-  <label>Business Name</label>
-  <input
-    type="text"
-    placeholder="Example: Orvayn Electronics"
-    value={businessName}
-    onChange={(e) => setBusinessName(e.target.value)}
-    style={{
-      width: "100%",
-      padding: "12px",
-      marginTop: "6px",
-      border: "1px solid #ccc",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxSizing: "border-box"
-    }}
-  />
-</div>
-
-<div style={{ marginBottom: "20px" }}>
-  <label>Business Hours</label>
-  <input
-    type="text"
-    placeholder="Example: 9am – 6pm"
-    value={hours}
-    onChange={(e) => setHours(e.target.value)}
-    style={{
-      width: "100%",
-      padding: "12px",
-      marginTop: "6px",
-      border: "1px solid #ccc",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxSizing: "border-box"
-    }}
-  />
-</div>
-
-<div style={{ marginBottom: "20px" }}>
-  <label>Business Type</label>
-  <input
-    type="text"
-    placeholder="Example: Phone Repairs, Restaurant, Salon"
-    value={businessType}
-    onChange={(e) => setBusinessType(e.target.value)}
-    style={{
-      width: "100%",
-      padding: "12px",
-      marginTop: "6px",
-      border: "1px solid #ccc",
-      borderRadius: "8px",
-      fontSize: "16px",
-      boxSizing: "border-box"
-    }}
-  />
-</div>
-{saved && <p style={{ color: "green", fontSize: "14px", marginBottom: "20px" }}>Saved!</p>}
-      <textarea
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Example: Allyuh open today?"
-        style={{
-          width: "100%",
-          height: "140px",
-          padding: "12px",
-          fontSize: "16px",
-          borderRadius: "8px",
-          border: "1px solid#ccc",
-        }}
-      />
-{/* QUICK REPLY BUTTONS */}
-<div style={{ marginTop: "15px", marginBottom: "20px" }}>
-  <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
-    Quick Reply Scenarios
-  </p>
-
-  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
-
-    <button
-      onClick={() => setMessage("Are you open today?")}
-      style={{
-        padding: "8px 12px",
-        border: "1px solid #ddd",
-        borderRadius: "6px",
-        background: "#f5f5f5",
-        cursor: "pointer"
-      }}
-    >
-      Are you open today?
-    </button>
-
-    <button
-      onClick={() => setMessage("How much is this item?")}
-      style={{
-        padding: "8px 12px",
-        border: "1px solid #ddd",
-        borderRadius: "6px",
-        background: "#f5f5f5",
-        cursor: "pointer"
-      }}
-    >
-      Price inquiry
-    </button>
-
-    <button
-      onClick={() => setMessage("Where are you located?")}
-      style={{
-        padding: "8px 12px",
-        border: "1px solid #ddd",
-        borderRadius: "6px",
-        background: "#f5f5f5",
-        cursor: "pointer"
-      }}
-    >
-      Location request
-    </button>
-
-    <button
-      onClick={() => setMessage("Do you have this item available?")}
-      style={{
-        padding: "8px 12px",
-        border: "1px solid #ddd",
-        borderRadius: "6px",
-        background: "#f5f5f5",
-        cursor: "pointer"
-      }}
-    >
-      Item availability
-    </button>
-
-  </div>
-</div>
-
-      <button
-        onClick={generateReply}
-        disabled={loading || !message.trim()}
-        style={{
-          marginTop: "20px",
-          padding: "12px 20px",
-          background: loading ? "#666" : "black",
-          color: "white",
-          border: "none",
-          borderRadius: "8px",
-          cursor: "pointer",
-        }}
-      >
-        {loading ? "Generating..." : "Generate Reply"}
-      </button>
-
-      {result && (
-  <div style={{ marginTop: "30px" }}>
-
-    <h3 style={{ marginBottom: "15px" }}>Suggested Reply</h3>
-
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-end",
-        marginBottom: "15px"
-      }}
-    >
-      {result
-  .split(/\d\.\s/)
-  .filter(Boolean)
-  .map((reply, index) => (
-    <div
-      key={index}
-      style={{
-        display: "flex",
-        justifyContent: "flex-end",
-        marginBottom: "10px"
-      }}
-    >
-      <div
-        style={{
-          background: "#dcf8c6",
-          padding: "12px 16px",
-          borderRadius: "10px",
-          maxWidth: "70%",
-          fontSize: "16px",
-          lineHeight: "1.4",
-          boxShadow: "0 1px 2px rgba(0,0,0,0.15)"
-        }}
-      >
-        {reply.trim()}
+      {/* Business Inputs */}
+      <div style={{ marginBottom: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: "200px" }}>
+          <label>Business Name</label>
+          <input
+            type="text"
+            placeholder="Example: Orvayn Electronics"
+            value={businessName}
+            onChange={(e) => setBusinessName(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "4px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              fontSize: "14px",
+              boxSizing: "border-box"
+            }}
+          />
+        </div>
+        <div style={{ flex: 1, minWidth: "150px" }}>
+          <label>Business Hours</label>
+          <input
+            type="text"
+            placeholder="Example: 9am – 6pm"
+            value={hours}
+            onChange={(e) => setHours(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "4px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              fontSize: "14px",
+              boxSizing: "border-box"
+            }}
+          />
+        </div>
+        <div style={{ flex: 1, minWidth: "200px" }}>
+          <label>Business Type</label>
+          <input
+            type="text"
+            placeholder="Example: Phone Repairs"
+            value={businessType}
+            onChange={(e) => setBusinessType(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "4px",
+              border: "1px solid #ccc",
+              borderRadius: "6px",
+              fontSize: "14px",
+              boxSizing: "border-box"
+            }}
+          />
+        </div>
       </div>
-    </div>
-  ))}
-    </div>
+      {saved && <p style={{ color: "green", fontSize: "12px", marginBottom: "10px" }}>Saved!</p>}
 
-    <button
-      onClick={copyReply}
-      style={{
-        padding: "10px 16px",
-        background: "#25D366",
-        color: "white",
-        border: "none",
-        borderRadius: "8px",
-        cursor: "pointer"
-      }}
-    >
-      Copy Reply
-    </button>
+      {/* Quick Reply Buttons */}
+      <div style={{ marginBottom: "20px" }}>
+        <p style={{ fontWeight: "bold", marginBottom: "8px" }}>Quick Start</p>
+        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+          <button onClick={() => setMessage("Are you open today?")} style={{ padding: "6px 10px", border: "1px solid #ddd", borderRadius: "4px", background: "#f5f5f5", cursor: "pointer" }}>Are you open today?</button>
+          <button onClick={() => setMessage("How much is this item?")} style={{ padding: "6px 10px", border: "1px solid #ddd", borderRadius: "4px", background: "#f5f5f5", cursor: "pointer" }}>Price inquiry</button>
+          <button onClick={() => setMessage("Where are you located?")} style={{ padding: "6px 10px", border: "1px solid #ddd", borderRadius: "4px", background: "#f5f5f5", cursor: "pointer" }}>Location request</button>
+          <button onClick={() => setMessage("Do you have this item available?")} style={{ padding: "6px 10px", border: "1px solid #ddd", borderRadius: "4px", background: "#f5f5f5", cursor: "pointer" }}>Item availability</button>
+        </div>
+      </div>
 
-  </div>
-)}
+      {/* Chat Area */}
+      <div style={{ flex: 1, border: "1px solid #ddd", borderRadius: "8px", padding: "10px", overflowY: "auto", marginBottom: "10px", background: "#f9f9f9" }}>
+        {conversation.length === 0 && <p style={{ color: "#999", textAlign: "center" }}>Start a conversation...</p>}
+        {conversation.map((msg, index) => (
+          <div key={index} style={{ display: "flex", justifyContent: msg.role === "user" ? "flex-start" : "flex-end", marginBottom: "10px" }}>
+            <div style={{
+              background: msg.role === "user" ? "#e3f2fd" : "#dcf8c6",
+              padding: "10px 14px",
+              borderRadius: "10px",
+              maxWidth: "70%",
+              fontSize: "14px",
+              lineHeight: "1.4",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.1)"
+            }}>
+              {msg.content}
+            </div>
+          </div>
+        ))}
+        {loading && <p style={{ textAlign: "center", color: "#666" }}>Typing...</p>}
+        <div ref={chatEndRef} />
+      </div>
+
+      {/* Input Area */}
+      <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <input
+          type="text"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+          placeholder="Type your message..."
+          style={{
+            flex: 1,
+            padding: "10px",
+            border: "1px solid #ccc",
+            borderRadius: "20px",
+            fontSize: "14px"
+          }}
+        />
+        <button
+          onClick={sendMessage}
+          disabled={loading || !message.trim()}
+          style={{
+            padding: "10px 16px",
+            background: loading ? "#666" : "#25D366",
+            color: "white",
+            border: "none",
+            borderRadius: "20px",
+            cursor: "pointer"
+          }}
+        >
+          Send
+        </button>
+        <button
+          onClick={clearChat}
+          style={{
+            padding: "10px 12px",
+            background: "#f44336",
+            color: "white",
+            border: "none",
+            borderRadius: "20px",
+            cursor: "pointer"
+          }}
+        >
+          Clear
+        </button>
+        {conversation.some(m => m.role === "assistant") && (
+          <button
+            onClick={copyLastReply}
+            style={{
+              padding: "10px 12px",
+              background: "#2196F3",
+              color: "white",
+              border: "none",
+              borderRadius: "20px",
+              cursor: "pointer"
+            }}
+          >
+            Copy Last
+          </button>
+        )}
+      </div>
     </main>
   );
 }
