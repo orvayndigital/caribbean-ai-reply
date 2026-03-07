@@ -52,27 +52,60 @@ export default function Home() {
         Paste a customer message and get a fast WhatsApp-style reply.
       </p>
 
-      <div style={{ marginBottom: "10px" }}>
+      <div style={{ marginBottom: "20px" }}>
+  <label>Business Name</label>
   <input
-    placeholder="Business Name"
+    type="text"
+    placeholder="Example: Orvayn Electronics"
     value={businessName}
     onChange={(e) => setBusinessName(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "12px",
+      marginTop: "6px",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      fontSize: "16px",
+      boxSizing: "border-box"
+    }}
   />
 </div>
 
-<div style={{ marginBottom: "10px" }}>
+<div style={{ marginBottom: "20px" }}>
+  <label>Business Hours</label>
   <input
-    placeholder="Business Hours (e.g. 9am–6pm)"
+    type="text"
+    placeholder="Example: 9am – 6pm"
     value={hours}
     onChange={(e) => setHours(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "12px",
+      marginTop: "6px",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      fontSize: "16px",
+      boxSizing: "border-box"
+    }}
   />
 </div>
 
-<div style={{ marginBottom: "10px" }}>
+<div style={{ marginBottom: "20px" }}>
+  <label>Business Type</label>
   <input
-    placeholder="Business Type (e.g. phone repairs)"
+    type="text"
+    placeholder="Example: Phone Repairs, Restaurant, Salon"
     value={businessType}
     onChange={(e) => setBusinessType(e.target.value)}
+    style={{
+      width: "100%",
+      padding: "12px",
+      marginTop: "6px",
+      border: "1px solid #ccc",
+      borderRadius: "8px",
+      fontSize: "16px",
+      boxSizing: "border-box"
+    }}
   />
 </div>
       <textarea
