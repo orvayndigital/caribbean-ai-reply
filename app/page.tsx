@@ -44,13 +44,13 @@ export default function Home() {
   }, [conversation]);
 
   useEffect(() => {
-    document.documentElement.style.setProperty("--bg-color", darkMode ? "#121212" : "#ffffff");
-    document.documentElement.style.setProperty("--text-color", darkMode ? "#ffffff" : "#000000");
-    document.documentElement.style.setProperty("--input-bg", darkMode ? "#333" : "#fff");
-    document.documentElement.style.setProperty("--border-color", darkMode ? "#555" : "#ccc");
-    document.documentElement.style.setProperty("--chat-bg", darkMode ? "#1e1e1e" : "#f9f9f9");
-    document.documentElement.style.setProperty("--user-bg", darkMode ? "#333" : "#e3f2fd");
-    document.documentElement.style.setProperty("--assistant-bg", darkMode ? "#2e7d32" : "#dcf8c6");
+    document.documentElement.style.setProperty("--bg-color", darkMode ? "#1a1a1a" : "#f8f9fa");
+    document.documentElement.style.setProperty("--text-color", darkMode ? "#e0e0e0" : "#1a1a1a");
+    document.documentElement.style.setProperty("--input-bg", darkMode ? "#2a2a2a" : "#ffffff");
+    document.documentElement.style.setProperty("--border-color", darkMode ? "#444" : "#e0e0e0");
+    document.documentElement.style.setProperty("--chat-bg", darkMode ? "#252525" : "#ffffff");
+    document.documentElement.style.setProperty("--user-bg", darkMode ? "#0066cc" : "#0066cc");
+    document.documentElement.style.setProperty("--assistant-bg", darkMode ? "#333" : "#e8f0fe");
   }, [darkMode]);
 
   async function sendMessage() {
@@ -104,23 +104,23 @@ export default function Home() {
     <>
       <style>{`
         :root {
-          --bg-color: #ffffff;
-          --text-color: #000000;
-          --input-bg: #fff;
-          --border-color: #ccc;
-          --chat-bg: #f9f9f9;
-          --user-bg: #e3f2fd;
-          --assistant-bg: #dcf8c6;
+          --bg-color: #f8f9fa;
+          --text-color: #1a1a1a;
+          --input-bg: #ffffff;
+          --border-color: #e0e0e0;
+          --chat-bg: #ffffff;
+          --user-bg: #0066cc;
+          --assistant-bg: #e8f0fe;
         }
         body {
           background-color: var(--bg-color);
           color: var(--text-color);
           margin: 0;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
         }
         @media (max-width: 768px) {
           main {
-            padding: 10px !important;
+            padding: 12px !important;
             max-width: 100% !important;
           }
           .business-inputs {
@@ -134,15 +134,16 @@ export default function Home() {
             flex-direction: column !important;
             gap: 8px !important;
           }
-          .input-area input {
+          .input-area input,
+          .input-area button {
             width: 100% !important;
           }
         }
       `}</style>
       <main style={{ padding: "20px", maxWidth: "700px", margin: "auto", minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "var(--bg-color)", color: "var(--text-color)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
-          <h1 style={{ fontSize: "28px", fontWeight: "bold", margin: 0 }}>
-            Caribbean WhatsApp Reply AI
+          <h1 style={{ fontSize: "28px", fontWeight: "700", margin: 0, color: "#0066cc" }}>
+            Caribbean Chat Pro
           </h1>
           <button
             onClick={() => setDarkMode(!darkMode)}
@@ -159,8 +160,8 @@ export default function Home() {
           </button>
         </div>
 
-        <p style={{ marginBottom: "20px" }}>
-          Chat with the AI assistant for your business.
+        <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
+          Professional AI-powered chat management for Caribbean businesses.
         </p>
 
         {/* Business Inputs */}
@@ -252,7 +253,7 @@ export default function Home() {
                 fontSize: "14px",
                 lineHeight: "1.4",
                 boxShadow: "0 1px 2px rgba(0,0,0,0.1)",
-                color: msg.role === "user" ? "var(--text-color)" : "#000"
+                color: msg.role === "user" ? "white" : (darkMode ? "#e0e0e0" : "#1a1a1a")
               }}>
                 {msg.content}
               </div>
@@ -285,11 +286,12 @@ export default function Home() {
             disabled={loading || !message.trim()}
             style={{
               padding: "10px 16px",
-              background: loading ? "#666" : "#25D366",
+              background: loading ? "#999" : "#0066cc",
               color: "white",
               border: "none",
               borderRadius: "20px",
-              cursor: "pointer"
+              cursor: "pointer",
+              fontWeight: "600"
             }}
           >
             Send
@@ -298,11 +300,12 @@ export default function Home() {
             onClick={clearChat}
             style={{
               padding: "10px 12px",
-              background: "#f44336",
+              background: "#666",
               color: "white",
               border: "none",
               borderRadius: "20px",
-              cursor: "pointer"
+              cursor: "pointer",
+              fontWeight: "600"
             }}
           >
             Clear
@@ -312,11 +315,12 @@ export default function Home() {
               onClick={copyLastReply}
               style={{
                 padding: "10px 12px",
-                background: "#2196F3",
+                background: "#555",
                 color: "white",
                 border: "none",
                 borderRadius: "20px",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontWeight: "600"
               }}
             >
               Copy Last
