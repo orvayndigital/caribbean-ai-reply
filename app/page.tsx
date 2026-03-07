@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const [message, setMessage] = useState("");
@@ -9,6 +9,25 @@ export default function Home() {
   const [businessName, setBusinessName] = useState("");
   const [hours, setHours] = useState("");
   const [businessType, setBusinessType] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    const savedBusinessName = localStorage.getItem("businessName");
+    const savedHours = localStorage.getItem("hours");
+    const savedBusinessType = localStorage.getItem("businessType");
+    if (savedBusinessName) setBusinessName(savedBusinessName);
+    if (savedHours) setHours(savedHours);
+    if (savedBusinessType) setBusinessType(savedBusinessType);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("businessName", businessName);
+    localStorage.setItem("hours", hours);
+    localStorage.setItem("businessType", businessType);
+    setSaved(true);
+    const timer = setTimeout(() => setSaved(false), 2000);
+    return () => clearTimeout(timer);
+  }, [businessName, hours, businessType]);
 
   async function generateReply() {
     setLoading(true);
@@ -108,6 +127,7 @@ export default function Home() {
     }}
   />
 </div>
+{saved && <p style={{ color: "green", fontSize: "14px", marginBottom: "20px" }}>Saved!</p>}
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
