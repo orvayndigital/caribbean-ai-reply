@@ -118,7 +118,7 @@ export default function Home() {
           padding: "12px",
           fontSize: "16px",
           borderRadius: "8px",
-          border: "1px solid #ccc",
+          border: "1px solid#ccc",
         }}
       />
 {/* QUICK REPLY BUTTONS */}
@@ -159,33 +159,48 @@ export default function Home() {
       </button>
 
       {result && (
-        <div
-          style={{
-            marginTop: "30px",
-            padding: "20px",
-            border: "1px solid #ddd",
-            borderRadius: "10px",
-            background: "#f9f9f9",
-          }}
-        >
-          <h3 style={{ marginBottom: "10px" }}>Suggested Reply</h3>
-          <p style={{ whiteSpace: "pre-wrap", marginBottom: "15px" }}>{result}</p>
+  <div style={{ marginTop: "30px" }}>
 
-          <button
-            onClick={copyReply}
-            style={{
-              padding: "10px 16px",
-              background: "#111",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-            }}
-          >
-            Copy Reply
-          </button>
-        </div>
-      )}
+    <h3 style={{ marginBottom: "15px" }}>Suggested Reply</h3>
+
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginBottom: "15px"
+      }}
+    >
+      <div
+        style={{
+          background: "#dcf8c6",
+          padding: "12px 16px",
+          borderRadius: "10px",
+          maxWidth: "70%",
+          fontSize: "16px",
+          lineHeight: "1.4",
+          boxShadow: "0 1px 2px rgba(0,0,0,0.15)"
+        }}
+      >
+        {result}
+      </div>
+    </div>
+
+    <button
+      onClick={copyReply}
+      style={{
+        padding: "10px 16px",
+        background: "#25D366",
+        color: "white",
+        border: "none",
+        borderRadius: "8px",
+        cursor: "pointer"
+      }}
+    >
+      Copy Reply
+    </button>
+
+  </div>
+)}
     </main>
   );
 }
