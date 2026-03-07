@@ -13,17 +13,16 @@ export async function POST(req: Request) {
     const completion = await openai.chat.completions.create({
       model: "gpt-4.1-mini",
       messages: [
-        {
-          role: "system",
-          content:
-            "You write short, friendly WhatsApp repliescontent:
-  "You write short, natural, friendly WhatsApp-style replies for Caribbean small businesses. Keep replies practical, human, and concise. Use light Caribbean wording when it feels natural, but do not overdo slang. Sound like a helpful local business owner or assistant. Do not write long paragraphs.", for Caribbean small businesses.",
-        },
-        {
-          role: "user",
-          content: message,
-        },
-      ],
+  {
+    role: "system",
+    content:
+      "You write short, natural, friendly WhatsApp-style replies for Caribbean small businesses",
+  },
+  {
+    role: "user",
+    content: message,
+  },
+],
     });
 
     const reply = completion.choices[0].message.content;
