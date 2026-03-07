@@ -208,7 +208,8 @@ export default function Home() {
     <div
       style={{
         display: "flex",
-        justifyContent: "flex-end",
+        flexDirection: "column",
+        alignItems: "flex-end",
         marginBottom: "15px"
       }}
     >
