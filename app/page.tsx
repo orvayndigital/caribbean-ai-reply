@@ -6,6 +6,9 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [businessName, setBusinessName] = useState("");
+  const [hours, setHours] = useState("");
+  const [businessType, setBusinessType] = useState("");
 
   async function generateReply() {
     setLoading(true);
@@ -13,12 +16,17 @@ export default function Home() {
 
     try {
       const res = await fetch("/api/reply", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message }),
-      });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    message,
+    businessName,
+    hours,
+    businessType,
+  }),
+});
 
       const data = await res.json();
       setResult(data.reply || "No reply generated.");
@@ -44,6 +52,23 @@ export default function Home() {
         Paste a customer message and get a fast WhatsApp-style reply.
       </p>
 
+      <input
+  placeholder="Business Name"
+  value={businessName}
+  onChange={(e) => setBusinessName(e.target.value)}
+/>
+
+<input
+  placeholder="Business Hours (e.g. 9am–6pm)"
+  value={hours}
+  onChange={(e) => setHours(e.target.value)}
+/>
+
+<input
+  placeholder="Business Type (e.g. phone repairs, restaurant)"
+  value={businessType}
+  onChange={(e) => setBusinessType(e.target.value)}
+/>
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
