@@ -212,6 +212,18 @@ export default function Home() {
         marginBottom: "15px"
       }}
     >
+      {result
+  .split(/\d\.\s/)
+  .filter(Boolean)
+  .map((reply, index) => (
+    <div
+      key={index}
+      style={{
+        display: "flex",
+        justifyContent: "flex-end",
+        marginBottom: "10px"
+      }}
+    >
       <div
         style={{
           background: "#dcf8c6",
@@ -223,8 +235,10 @@ export default function Home() {
           boxShadow: "0 1px 2px rgba(0,0,0,0.15)"
         }}
       >
-        {result}
+        {reply.trim()}
       </div>
+    </div>
+  ))}
     </div>
 
     <button
