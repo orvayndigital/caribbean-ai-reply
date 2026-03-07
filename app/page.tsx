@@ -250,7 +250,7 @@ export default function Home() {
         </div>
       </main>
       <footer style={{ textAlign: "center", padding: "10px", fontSize: "12px", color: "#666", borderTop: "1px solid #ddd", marginTop: "20px" }}>
-        © 2026 Orvayn Digital. All rights reserved.
+        © 2026 Orvayn Digital. All rights reserved. | Aleem's Artificial Intelligence Labs
       </footer>
     </>
   );
