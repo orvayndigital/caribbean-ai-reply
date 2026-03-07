@@ -5,28 +5,43 @@ import { useState } from "react";
 export default function Home() {
   const [message, setMessage] = useState("");
   const [result, setResult] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function generateReply() {
-    const res = await fetch("/api/reply", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message }),
-    });
+    setLoading(true);
+    setResult("");
 
-    const data = await res.json();
-    setResult(data.reply);
+    try {
+      const res = await fetch("/api/reply", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
+
+      const data = await res.json();
+      setResult(data.reply || "No reply generated.");
+    } catch (error) {
+      setResult("Something went wrong. Please try again.");
+    }
+
+    setLoading(false);
+  }
+
+  async function copyReply() {
+    await navigator.clipboard.writeText(result);
+    alert("Reply copied");
   }
 
   return (
     <main style={{ padding: "40px", maxWidth: "700px", margin: "auto" }}>
-      <h1 style={{ fontSize: "28px", fontWeight: "bold" }}>
+      <h1 style={{ fontSize: "28px", fontWeight: "bold", marginBottom: "10px" }}>
         Caribbean WhatsApp Reply AI
       </h1>
 
-      <p style={{ marginTop: "10px" }}>
-        Paste a customer message and generate a reply.
+      <p style={{ marginBottom: "20px" }}>
+        Paste a customer message and get a fast WhatsApp-style reply.
       </p>
 
       <textarea
@@ -35,28 +50,56 @@ export default function Home() {
         placeholder="Example: Allyuh open today?"
         style={{
           width: "100%",
-          height: "120px",
-          marginTop: "20px",
-          padding: "10px",
+          height: "140px",
+          padding: "12px",
+          fontSize: "16px",
+          borderRadius: "8px",
+          border: "1px solid #ccc",
         }}
       />
 
       <button
         onClick={generateReply}
+        disabled={loading || !message.trim()}
         style={{
           marginTop: "20px",
-          padding: "10px 20px",
-          background: "black",
+          padding: "12px 20px",
+          background: loading ? "#666" : "black",
           color: "white",
+          border: "none",
+          borderRadius: "8px",
+          cursor: "pointer",
         }}
       >
-        Generate Reply
+        {loading ? "Generating..." : "Generate Reply"}
       </button>
 
       {result && (
-        <div style={{ marginTop: "30px" }}>
-          <h3>Suggested Reply:</h3>
-          <p>{result}</p>
+        <div
+          style={{
+            marginTop: "30px",
+            padding: "20px",
+            border: "1px solid #ddd",
+            borderRadius: "10px",
+            background: "#f9f9f9",
+          }}
+        >
+          <h3 style={{ marginBottom: "10px" }}>Suggested Reply</h3>
+          <p style={{ whiteSpace: "pre-wrap", marginBottom: "15px" }}>{result}</p>
+
+          <button
+            onClick={copyReply}
+            style={{
+              padding: "10px 16px",
+              background: "#111",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+            }}
+          >
+            Copy Reply
+          </button>
         </div>
       )}
     </main>
