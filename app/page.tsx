@@ -7,6 +7,20 @@ type Message = {
   content: string;
 };
 
+type Product = {
+  id: string;
+  name: string;
+  description: string;
+  cost: string;
+  imageUrl?: string;
+};
+
+type DeliveryLocation = {
+  id: string;
+  name: string;
+  cost: string;
+};
+
 export default function Home() {
   const [conversation, setConversation] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
@@ -16,6 +30,14 @@ export default function Home() {
   const [businessType, setBusinessType] = useState("");
   const [saved, setSaved] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [deliveryLocations, setDeliveryLocations] = useState<DeliveryLocation[]>([]);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [showLocationForm, setShowLocationForm] = useState(false);
+  const [newProduct, setNewProduct] = useState<Partial<Product>>({ name: "", description: "", cost: "" });
+  const [newLocation, setNewLocation] = useState({ name: "", cost: "" });
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingLocation, setEditingLocation] = useState<DeliveryLocation | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,10 +45,15 @@ export default function Home() {
     const savedHours = localStorage.getItem("hours");
     const savedBusinessType = localStorage.getItem("businessType");
     const savedTheme = localStorage.getItem("darkMode");
+    const savedProducts = localStorage.getItem("products");
+    const savedLocations = localStorage.getItem("deliveryLocations");
+    
     if (savedBusinessName) setBusinessName(savedBusinessName);
     if (savedHours) setHours(savedHours);
     if (savedBusinessType) setBusinessType(savedBusinessType);
     if (savedTheme === "true") setDarkMode(true);
+    if (savedProducts) setProducts(JSON.parse(savedProducts));
+    if (savedLocations) setDeliveryLocations(JSON.parse(savedLocations));
   }, []);
 
   useEffect(() => {
@@ -34,10 +61,12 @@ export default function Home() {
     localStorage.setItem("hours", hours);
     localStorage.setItem("businessType", businessType);
     localStorage.setItem("darkMode", darkMode.toString());
+    localStorage.setItem("products", JSON.stringify(products));
+    localStorage.setItem("deliveryLocations", JSON.stringify(deliveryLocations));
     setSaved(true);
     const timer = setTimeout(() => setSaved(false), 2000);
     return () => clearTimeout(timer);
-  }, [businessName, hours, businessType, darkMode]);
+  }, [businessName, hours, businessType, darkMode, products, deliveryLocations]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -98,6 +127,82 @@ export default function Home() {
       await navigator.clipboard.writeText(lastAssistant.content);
       alert("Last reply copied");
     }
+  }
+
+  function addProduct() {
+    if (!newProduct.name || !newProduct.cost) {
+      alert("Product name and cost are required");
+      return;
+    }
+    
+    if (editingProduct) {
+      setProducts(products.map(p => p.id === editingProduct.id ? { 
+        id: editingProduct.id,
+        name: newProduct.name || '',
+        description: newProduct.description || '',
+        cost: newProduct.cost || '',
+        imageUrl: newProduct.imageUrl
+      } : p));
+      setEditingProduct(null);
+    } else {
+      const product: Product = {
+        id: Date.now().toString(),
+        name: newProduct.name || '',
+        description: newProduct.description || '',
+        cost: newProduct.cost || '',
+        imageUrl: newProduct.imageUrl,
+      };
+      setProducts([...products, product]);
+    }
+    
+    setNewProduct({ name: "", description: "", cost: "" });
+    setShowProductForm(false);
+  }
+
+  function deleteProduct(id: string) {
+    if (confirm("Delete this product?")) {
+      setProducts(products.filter(p => p.id !== id));
+    }
+  }
+
+  function startEditProduct(product: Product) {
+    setNewProduct(product);
+    setEditingProduct(product);
+    setShowProductForm(true);
+  }
+
+  function addLocation() {
+    if (!newLocation.name || !newLocation.cost) {
+      alert("Location name and cost are required");
+      return;
+    }
+
+    if (editingLocation) {
+      setDeliveryLocations(deliveryLocations.map(l => l.id === editingLocation.id ? { ...newLocation, id: editingLocation.id } : l));
+      setEditingLocation(null);
+    } else {
+      const location: DeliveryLocation = {
+        id: Date.now().toString(),
+        name: newLocation.name,
+        cost: newLocation.cost,
+      };
+      setDeliveryLocations([...deliveryLocations, location]);
+    }
+
+    setNewLocation({ name: "", cost: "" });
+    setShowLocationForm(false);
+  }
+
+  function deleteLocation(id: string) {
+    if (confirm("Delete this delivery location?")) {
+      setDeliveryLocations(deliveryLocations.filter(l => l.id !== id));
+    }
+  }
+
+  function startEditLocation(location: DeliveryLocation) {
+    setNewLocation(location);
+    setEditingLocation(location);
+    setShowLocationForm(true);
   }
 
   return (
@@ -163,6 +268,8 @@ export default function Home() {
         <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
           Professional AI-powered chat management for Caribbean businesses.
         </p>
+
+        <div style={{ flex: 1, overflowY: "auto", paddingRight: "8px" }}>
 
         {/* Business Inputs */}
         <div className="business-inputs" style={{ marginBottom: "20px", display: "flex", gap: "10px", flexWrap: "wrap" }}>
@@ -240,6 +347,294 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Products Section */}
+        <div style={{ marginBottom: "20px", borderBottom: "1px solid var(--border-color)", paddingBottom: "15px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+            <h3 style={{ margin: 0, color: "var(--text-color)", fontSize: "16px", fontWeight: "600" }}>Products</h3>
+            <button
+              onClick={() => {
+                setShowProductForm(!showProductForm);
+                setEditingProduct(null);
+                setNewProduct({ name: "", description: "", cost: "", imageUrl: "" });
+              }}
+              style={{
+                padding: "6px 12px",
+                background: "#0066cc",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "600"
+              }}
+            >
+              {showProductForm ? "Cancel" : "+ Add Product"}
+            </button>
+          </div>
+
+          {showProductForm && (
+            <div style={{ background: "var(--input-bg)", padding: "12px", borderRadius: "6px", marginBottom: "12px", border: "1px solid var(--border-color)" }}>
+              <input
+                type="text"
+                placeholder="Product name"
+                value={newProduct.name}
+                onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "8px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--text-color)",
+                  boxSizing: "border-box"
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Description"
+                value={newProduct.description}
+                onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "8px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--text-color)",
+                  boxSizing: "border-box"
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Cost (e.g., $15.99)"
+                value={newProduct.cost}
+                onChange={(e) => setNewProduct({ ...newProduct, cost: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "8px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--text-color)",
+                  boxSizing: "border-box"
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Image URL (optional)"
+                value={newProduct.imageUrl}
+                onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "8px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--text-color)",
+                  boxSizing: "border-box"
+                }}
+              />
+              <button
+                onClick={addProduct}
+                style={{
+                  padding: "8px 12px",
+                  background: "#0066cc",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  width: "100%"
+                }}
+              >
+                {editingProduct ? "Update Product" : "Save Product"}
+              </button>
+            </div>
+          )}
+
+          {products.length === 0 ? (
+            <p style={{ color: "#999", fontSize: "14px" }}>No products added yet</p>
+          ) : (
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: "12px" }}>
+              {products.map((product) => (
+                <div key={product.id} style={{ background: "var(--input-bg)", padding: "10px", borderRadius: "6px", border: "1px solid var(--border-color)" }}>
+                  {product.imageUrl && (
+                    <img src={product.imageUrl} alt={product.name} style={{ width: "100%", height: "100px", objectFit: "cover", borderRadius: "4px", marginBottom: "8px" }} />
+                  )}
+                  <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "600", color: "var(--text-color)" }}>{product.name}</h4>
+                  {product.description && <p style={{ margin: "0 0 4px 0", fontSize: "12px", color: "#999" }}>{product.description}</p>}
+                  <p style={{ margin: "0 0 8px 0", fontSize: "14px", fontWeight: "600", color: "#0066cc" }}>{product.cost}</p>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <button
+                      onClick={() => startEditProduct(product)}
+                      style={{
+                        flex: 1,
+                        padding: "4px",
+                        background: "#444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                        fontSize: "11px"
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteProduct(product.id)}
+                      style={{
+                        flex: 1,
+                        padding: "4px",
+                        background: "#666",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                        fontSize: "11px"
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Delivery Locations Section */}
+        <div style={{ marginBottom: "20px", borderBottom: "1px solid var(--border-color)", paddingBottom: "15px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+            <h3 style={{ margin: 0, color: "var(--text-color)", fontSize: "16px", fontWeight: "600" }}>Delivery Locations</h3>
+            <button
+              onClick={() => {
+                setShowLocationForm(!showLocationForm);
+                setEditingLocation(null);
+                setNewLocation({ name: "", cost: "" });
+              }}
+              style={{
+                padding: "6px 12px",
+                background: "#0066cc",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "12px",
+                fontWeight: "600"
+              }}
+            >
+              {showLocationForm ? "Cancel" : "+ Add Location"}
+            </button>
+          </div>
+
+          {showLocationForm && (
+            <div style={{ background: "var(--input-bg)", padding: "12px", borderRadius: "6px", marginBottom: "12px", border: "1px solid var(--border-color)" }}>
+              <input
+                type="text"
+                placeholder="Location name (e.g., Downtown, Uptown)"
+                value={newLocation.name}
+                onChange={(e) => setNewLocation({ ...newLocation, name: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "8px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--text-color)",
+                  boxSizing: "border-box"
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Delivery cost (e.g., $5.00)"
+                value={newLocation.cost}
+                onChange={(e) => setNewLocation({ ...newLocation, cost: e.target.value })}
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  marginBottom: "8px",
+                  border: "1px solid var(--border-color)",
+                  borderRadius: "4px",
+                  fontSize: "14px",
+                  backgroundColor: "var(--input-bg)",
+                  color: "var(--text-color)",
+                  boxSizing: "border-box"
+                }}
+              />
+              <button
+                onClick={addLocation}
+                style={{
+                  padding: "8px 12px",
+                  background: "#0066cc",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  width: "100%"
+                }}
+              >
+                {editingLocation ? "Update Location" : "Save Location"}
+              </button>
+            </div>
+          )}
+
+          {deliveryLocations.length === 0 ? (
+            <p style={{ color: "#999", fontSize: "14px" }}>No delivery locations added yet</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {deliveryLocations.map((location) => (
+                <div key={location.id} style={{ background: "var(--input-bg)", padding: "12px", borderRadius: "6px", border: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                  <div>
+                    <h4 style={{ margin: "0 0 4px 0", fontSize: "14px", fontWeight: "600", color: "var(--text-color)" }}>{location.name}</h4>
+                    <p style={{ margin: 0, fontSize: "14px", fontWeight: "600", color: "#0066cc" }}>Delivery: {location.cost}</p>
+                  </div>
+                  <div style={{ display: "flex", gap: "4px" }}>
+                    <button
+                      onClick={() => startEditLocation(location)}
+                      style={{
+                        padding: "6px 10px",
+                        background: "#444",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                        fontSize: "12px"
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => deleteLocation(location.id)}
+                      style={{
+                        padding: "6px 10px",
+                        background: "#666",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "3px",
+                        cursor: "pointer",
+                        fontSize: "12px"
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Chat Area */}
         <div style={{ flex: 1, border: "1px solid var(--border-color)", borderRadius: "8px", padding: "10px", overflowY: "auto", marginBottom: "10px", backgroundColor: "var(--chat-bg)" }}>
           {conversation.length === 0 && <p style={{ color: "#999", textAlign: "center" }}>Start a conversation...</p>}
@@ -263,8 +658,10 @@ export default function Home() {
           <div ref={chatEndRef} />
         </div>
 
+        </div>
+
         {/* Input Area */}
-        <div className="input-area" style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+        <div className="input-area" style={{ display: "flex", gap: "10px", alignItems: "center", marginTop: "15px" }}>
           <input
             type="text"
             value={message}
