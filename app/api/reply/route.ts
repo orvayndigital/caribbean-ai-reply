@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    const { message } = await req.json();
+    const { message, businessName, hours, businessType } = await req.json();
 
     const openai = new OpenAI({
       apiKey: process.env.OPENAI_API_KEY,
@@ -15,9 +15,17 @@ export async function POST(req: Request) {
       messages: [
   {
     role: "system",
-    content:
-      "You write short, natural, friendly WhatsApp-style replies for Caribbean small businesses",
-  },
+  content: `
+You are a WhatsApp assistant for Caribbean businesses.
+
+Business name: ${businessName}
+Business hours: ${hours}
+Business type: ${businessType}
+
+Write short, friendly WhatsApp replies to customers.
+Keep the tone natural and Caribbean conversational.
+`,
+},
   {
     role: "user",
     content: message,
