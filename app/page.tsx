@@ -121,6 +121,26 @@ export default function Home() {
           border: "1px solid #ccc",
         }}
       />
+{/* QUICK REPLY BUTTONS */}
+<div style={{ marginTop: "15px", marginBottom: "15px" }}>
+  <p style={{ fontWeight: "bold" }}>Quick Reply Scenarios</p>
+
+  <button onClick={() => setMessage("Are you open today?")}>
+    Are you open today?
+  </button>
+
+  <button onClick={() => setMessage("How much is this item?")}>
+    Price inquiry
+  </button>
+
+  <button onClick={() => setMessage("Where are you located?")}>
+    Location request
+  </button>
+
+  <button onClick={() => setMessage("Do you have this item available?")}>
+    Item availability
+  </button>
+</div>
 
       <button
         onClick={generateReply}
