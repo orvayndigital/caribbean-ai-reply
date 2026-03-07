@@ -102,6 +102,8 @@ export default function Home() {
           businessName,
           hours,
           businessType,
+          products,
+          deliveryLocations,
           history: conversation,
         }),
       });
