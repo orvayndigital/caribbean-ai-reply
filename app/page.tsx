@@ -52,23 +52,29 @@ export default function Home() {
         Paste a customer message and get a fast WhatsApp-style reply.
       </p>
 
-      <input
-  placeholder="Business Name"
-  value={businessName}
-  onChange={(e) => setBusinessName(e.target.value)}
-/>
+      <div style={{ marginBottom: "10px" }}>
+  <input
+    placeholder="Business Name"
+    value={businessName}
+    onChange={(e) => setBusinessName(e.target.value)}
+  />
+</div>
 
-<input
-  placeholder="Business Hours (e.g. 9am–6pm)"
-  value={hours}
-  onChange={(e) => setHours(e.target.value)}
-/>
+<div style={{ marginBottom: "10px" }}>
+  <input
+    placeholder="Business Hours (e.g. 9am–6pm)"
+    value={hours}
+    onChange={(e) => setHours(e.target.value)}
+  />
+</div>
 
-<input
-  placeholder="Business Type (e.g. phone repairs, restaurant)"
-  value={businessType}
-  onChange={(e) => setBusinessType(e.target.value)}
-/>
+<div style={{ marginBottom: "10px" }}>
+  <input
+    placeholder="Business Type (e.g. phone repairs)"
+    value={businessType}
+    onChange={(e) => setBusinessType(e.target.value)}
+  />
+</div>
       <textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
