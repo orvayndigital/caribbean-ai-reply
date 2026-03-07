@@ -22,8 +22,9 @@ Business name: ${businessName}
 Business hours: ${hours}
 Business type: ${businessType}
 
-Write short, friendly WhatsApp replies to customers.
-Keep the tone natural and Caribbean conversational.
+Write 3 short WhatsApp-style replies the business can choose from.
+Keep them friendly and Caribbean conversational.
+Number them 1, 2, and 3.
 `,
 },
   {
