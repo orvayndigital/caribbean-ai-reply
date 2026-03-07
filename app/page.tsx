@@ -122,24 +122,66 @@ export default function Home() {
         }}
       />
 {/* QUICK REPLY BUTTONS */}
-<div style={{ marginTop: "15px", marginBottom: "15px" }}>
-  <p style={{ fontWeight: "bold" }}>Quick Reply Scenarios</p>
+<div style={{ marginTop: "15px", marginBottom: "20px" }}>
+  <p style={{ fontWeight: "bold", marginBottom: "10px" }}>
+    Quick Reply Scenarios
+  </p>
 
-  <button onClick={() => setMessage("Are you open today?")}>
-    Are you open today?
-  </button>
+  <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
 
-  <button onClick={() => setMessage("How much is this item?")}>
-    Price inquiry
-  </button>
+    <button
+      onClick={() => setMessage("Are you open today?")}
+      style={{
+        padding: "8px 12px",
+        border: "1px solid #ddd",
+        borderRadius: "6px",
+        background: "#f5f5f5",
+        cursor: "pointer"
+      }}
+    >
+      Are you open today?
+    </button>
 
-  <button onClick={() => setMessage("Where are you located?")}>
-    Location request
-  </button>
+    <button
+      onClick={() => setMessage("How much is this item?")}
+      style={{
+        padding: "8px 12px",
+        border: "1px solid #ddd",
+        borderRadius: "6px",
+        background: "#f5f5f5",
+        cursor: "pointer"
+      }}
+    >
+      Price inquiry
+    </button>
 
-  <button onClick={() => setMessage("Do you have this item available?")}>
-    Item availability
-  </button>
+    <button
+      onClick={() => setMessage("Where are you located?")}
+      style={{
+        padding: "8px 12px",
+        border: "1px solid #ddd",
+        borderRadius: "6px",
+        background: "#f5f5f5",
+        cursor: "pointer"
+      }}
+    >
+      Location request
+    </button>
+
+    <button
+      onClick={() => setMessage("Do you have this item available?")}
+      style={{
+        padding: "8px 12px",
+        border: "1px solid #ddd",
+        borderRadius: "6px",
+        background: "#f5f5f5",
+        cursor: "pointer"
+      }}
+    >
+      Item availability
+    </button>
+
+  </div>
 </div>
 
       <button

@@ -22,9 +22,15 @@ Business name: ${businessName}
 Business hours: ${hours}
 Business type: ${businessType}
 
-Write 3 short WhatsApp-style replies the business can choose from.
-Keep them friendly and Caribbean conversational.
-Number them 1, 2, and 3.
+Write 3 short WhatsApp-style replies.
+
+Separate each reply with a line break.
+
+Format:
+
+1.
+2.
+3.
 `,
 },
   {
