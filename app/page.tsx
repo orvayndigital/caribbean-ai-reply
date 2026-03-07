@@ -2,15 +2,20 @@
 
 import { useState, useEffect, useRef } from "react";
 
+type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
 export default function Home() {
-  const [conversation, setConversation] = useState([]);
+  const [conversation, setConversation] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [hours, setHours] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [saved, setSaved] = useState(false);
-  const chatEndRef = useRef(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const savedBusinessName = localStorage.getItem("businessName");
@@ -37,7 +42,7 @@ export default function Home() {
   async function sendMessage() {
     if (!message.trim()) return;
 
-    const userMessage = { role: "user", content: message };
+    const userMessage: Message = { role: "user", content: message };
     const newConversation = [...conversation, userMessage];
     setConversation(newConversation);
     setMessage("");
@@ -59,10 +64,11 @@ export default function Home() {
       });
 
       const data = await res.json();
-      const assistantMessage = { role: "assistant", content: data.reply };
+      const assistantMessage: Message = { role: "assistant", content: data.reply };
       setConversation([...newConversation, assistantMessage]);
     } catch (error) {
-      setConversation([...newConversation, { role: "assistant", content: "Something went wrong. Please try again." }]);
+      const errorMessage: Message = { role: "assistant", content: "Something went wrong. Please try again." };
+      setConversation([...newConversation, errorMessage]);
     }
 
     setLoading(false);
